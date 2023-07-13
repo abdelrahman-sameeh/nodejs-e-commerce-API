@@ -6,9 +6,6 @@ const dbConnection = () => {
       .connect(process.env.DB_URI)
       .then(conn => {
          console.log('connect with database ' + conn.connection.host);
-      }).catch(err => {
-         console.error('error ' + err);
-         process.exit(1)
       })
 
 }

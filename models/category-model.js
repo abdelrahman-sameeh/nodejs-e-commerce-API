@@ -4,7 +4,8 @@ const { default: mongoose } = require("mongoose")
 const categorySchema = mongoose.Schema({
    name: {
       type: String,
-      required: [true, 'Category required'],
+      trim: true,
+      required: [true, 'Category name required'],
       unique: [true, 'Category must be unique'],
       maxlength: [32, 'Category name is too long'],
       minlength: [3, 'Category name is too short']

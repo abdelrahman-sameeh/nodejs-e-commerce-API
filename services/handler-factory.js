@@ -2,6 +2,7 @@ const AsyncHandler = require('express-async-handler')
 const { default: slugify } = require('slugify')
 const ApiError = require('../utils/ApiError')
 const ApiFeature = require('../utils/ApiFeature')
+const Product = require('../models/product-model')
 
 /// @params {String} modelName 
 // ==>the model name
@@ -54,8 +55,8 @@ exports.getListOfDocuments = (Model, targetName = '') =>
 
       // execute mongoose query
       const { mongooseQuery, paginationResults } = apiFeature
-
       const response = await mongooseQuery;
+
       res.status(200).json({ results: response.length, paginationResults, data: response })
    })
 

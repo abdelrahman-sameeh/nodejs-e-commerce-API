@@ -4,10 +4,12 @@ class ApiFeature {
       this.queryString = queryString;
    }
 
-   // @desc  filter data by fields
+
+   // code word ---------------------------->>
+   // // @desc  filter data by fields
    filter() {
       const queryStringObj = { ...this.queryString }
-      const excludeFields = ['limit', 'sort', 'page', 'fields']
+      const excludeFields = ['limit', 'sort', 'page', 'fields', 'keyword']
       excludeFields.forEach(field => delete queryStringObj[field])
 
       /* 

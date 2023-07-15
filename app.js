@@ -43,39 +43,6 @@ app.use('/api/v1/subcategories', subCategoryRoute)
 app.use('/api/v1/brands', brandsRoute)
 app.use('/api/v1/products', productRoute)
 
-app.get('/api/v1/test', expressAsyncHandler(async (req, res, next) => {
-   // build mongoose query
-
-   const query = {}
-   if (req.query.keyword) {
-      query.$or = [
-         { title: { $regex: req.query.keyword, $options: 'i' } },
-         { description: { $regex: req.query.keyword, $options: 'i' } },
-      ]
-   }
-
-   let sort = '-createdAt';
-   if (req.query.sort) {
-      sort = req.query.sort
-      sort = sort.replace(/,/g, ' ')
-   }
-
-
-   const mongooseQuery = Product.find()
-      .sort(sort)
-      .find(query)
-
-
-
-   // execute mongoose query
-   const response = await mongooseQuery
-   res.json({
-      results: response.length,
-      data: response
-
-   })
-}))
-
 
 
 

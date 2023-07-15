@@ -9,12 +9,12 @@ const categoryRoute = require('./routes/category-route')
 const subCategoryRoute = require('./routes/sub-category-route')
 const brandsRoute = require('./routes/brands-route')
 const productRoute = require('./routes/product-route')
+const authRoute = require('./routes/user-route')
 
 const { dbConnection } = require('./config/database')
 const ApiError = require('./utils/ApiError')
 const { globalError } = require('./middleware/error-middleware')
-const expressAsyncHandler = require('express-async-handler')
-const Product = require('./models/product-model')
+
 
 // connect with database
 dbConnection()
@@ -42,6 +42,7 @@ app.use('/api/v1/categories', categoryRoute)
 app.use('/api/v1/subcategories', subCategoryRoute)
 app.use('/api/v1/brands', brandsRoute)
 app.use('/api/v1/products', productRoute)
+app.use('/api/v1/users', authRoute)
 
 
 

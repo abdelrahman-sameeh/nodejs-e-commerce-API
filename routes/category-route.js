@@ -1,25 +1,38 @@
 const express = require('express')
 const router = express.Router()
 
-const { createCategory, getAllCategories, getSpecificCategory, updateSpecificCategory, deleteCategory } = require('../services/category-service')
+const { createCategory, getAllCategories, getSpecificCategory, updateSpecificCategory, deleteCategory, uploadCategoryImage, resizeCategoryImage } = require('../services/category-service')
 const { getCategoryValidator, updateCategoryValidator, deleteCategoryValidator, createCategoryValidator } = require('../utils/validator/category-validator')
 const subCategoryRoute = require('./sub-category-route')
 
+
+
+// nested route
 // if original url === categories/:categoryId/subcategories
 //       go to subcategories router 
 router.use('/:categoryId/subcategories', subCategoryRoute)
 
 
 
-router.route('/') 
+router.route('/')
    .get(getAllCategories)
-   .post(createCategoryValidator, createCategory)
+   .post(
+      uploadCategoryImage,
+      resizeCategoryImage,
+      createCategoryValidator,
+      createCategory
+   )
 
 
 
 router.route('/:id')
    .get(getCategoryValidator, getSpecificCategory)
-   .put(updateCategoryValidator, updateSpecificCategory)
+   .put(
+      uploadCategoryImage,
+      resizeCategoryImage,
+      updateCategoryValidator,
+      updateSpecificCategory
+   )
    .delete(deleteCategoryValidator, deleteCategory)
 
 

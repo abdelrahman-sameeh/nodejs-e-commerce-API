@@ -1,6 +1,9 @@
+const path = require('path')
+
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
+
 require('dotenv').config({ path: '.env' })
 const categoryRoute = require('./routes/category-route')
 const subCategoryRoute = require('./routes/sub-category-route')
@@ -20,6 +23,7 @@ dbConnection()
 // Middleware
 
 app.use(express.json())
+app.use(express.static(path.join(__dirname, 'uploads')))
 
 
 if (process.env.NODE_ENV === 'dev') {

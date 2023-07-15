@@ -66,13 +66,37 @@ const productSchema = mongoose.Schema({
    }
 }, { timestamps: true })
 
-productSchema.pre(/^find/, function (next){
+productSchema.pre(/^find/, function (next) {
    this.populate({
       path: 'category',
       select: 'name'
    })
    next()
 })
+
+setProductImagesURL = (doc) => {
+   if (doc.imageCover) {
+      const imageCoverURL = `${process.env.BASE_URL}/products/${doc.imageCover}`
+      doc.imageCover = imageCoverURL
+   }
+   if (doc.images) {
+      let imageList = []
+      doc.images.forEach(image => {
+         const imageURL = `${process.env.BASE_URL}/products/${image}`
+         imageList.push(imageURL)
+      })
+      doc.images = imageList
+   }
+}
+
+productSchema.post('init', (doc) => {
+   setProductImagesURL(doc)
+})
+
+productSchema.post('save', (doc) => {
+   setProductImagesURL(doc)
+})
+
 
 const Product = mongoose.model('Product', productSchema);
 

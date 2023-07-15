@@ -12,8 +12,26 @@ const brandSchema = mongoose.Schema({
    slug: {
       type: String,
       lowercase: true,
-   }
+   },
+   image: String
 }, { timestamps: true })
+
+
+const setImageURL = (doc) => {
+   if (doc.image) {
+      const imageUrl = `${process.env.BASE_URL}/brands/${doc.image}`
+      doc.image = imageUrl
+   }
+}
+
+// getOne, getAll, update
+brandSchema.post('init', (doc) => {
+   setImageURL(doc)
+})
+// create
+brandSchema.post('save', (doc) => {
+   setImageURL(doc)
+})
 
 const Brand = mongoose.model('Brands', brandSchema)
 

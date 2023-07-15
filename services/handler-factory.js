@@ -17,9 +17,15 @@ const Product = require('../models/product-model')
 // access  private
 exports.createOne = (modelName, targetName) =>
    AsyncHandler(async (req, res, next) => {
+
       const data = {
          ...req.body,
-         slug: req.body.name ? slugify(req.body.name) : slugify(req.body.title)
+      }
+      if (req.body.name) {
+         data.slug = slugify(req.body.name)
+      }
+      if (req.body.title) {
+         data.slug = slugify(req.body.title)
       }
       const response = await modelName.create(data)
       if (!response) {
@@ -92,8 +98,15 @@ exports.updateOne = (modelName, targetName) =>
 
       const data = {
          ...req.body,
-         slug: req.body.name ? slugify(req.body.name) : slugify(req.body.title)
       }
+
+      if (req.body.name) {
+         data.slug = slugify(req.body.name)
+      }
+      if (req.body.title) {
+         data.slug = slugify(req.body.title)
+      }
+
 
       const response = await modelName.findByIdAndUpdate(id, data, { new: true })
       if (!response) {

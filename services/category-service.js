@@ -1,5 +1,31 @@
+const { v4: uuidv4 } = require('uuid');
+const sharp = require("sharp");
+const AsyncHandler = require("express-async-handler");
+
 const Category = require("../models/category-model");
+const { uploadSingleImage } = require("../middleware/upload-image-middleware");
 const { deleteOne, updateOne, getOne, getListOfDocuments, createOne } = require("./handler-factory");
+
+
+const uploadCategoryImage = uploadSingleImage('image')
+
+
+const resizeCategoryImage = AsyncHandler(async (req, res, next) => {
+   const filename = `category-${uuidv4()}-${Date.now()}.jpeg`;
+
+   await sharp(req.file.buffer)
+      .resize(600, 600)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(`uploads/categories/${filename}`)
+
+   // save image in body
+   req.body.image = filename
+   next()
+})
+
+
+// ***************************************   CRUD   ***************************************
 
 // @desc    Create category
 // @route   POST  /api/v1/categories
@@ -32,5 +58,7 @@ module.exports = {
    getAllCategories,
    getSpecificCategory,
    updateSpecificCategory,
-   deleteCategory
+   deleteCategory,
+   uploadCategoryImage,
+   resizeCategoryImage
 }

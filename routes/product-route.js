@@ -1,5 +1,5 @@
 const express = require('express');
-const { createProduct, getListOfProducts, getSpecificProduct, deleteSpecificProduct, updateSpecificProduct } = require('../services/product-service');
+const { createProduct, getListOfProducts, getSpecificProduct, deleteSpecificProduct, updateSpecificProduct, uploadProductImages, resizeProductImages } = require('../services/product-service');
 const { createProductValidator, updateSpecificProductValidator, getSpecificProductValidator, deleteSpecificProductValidator } = require('../utils/validator/product-validator');
 const router = express.Router();
 
@@ -7,10 +7,20 @@ const router = express.Router();
 
 router.route('/')
    .get(getListOfProducts)
-   .post(createProductValidator, createProduct)
+   .post(
+      uploadProductImages,
+      resizeProductImages,
+      createProductValidator,
+      createProduct
+   )
 router.route('/:id')
    .get(getSpecificProductValidator, getSpecificProduct)
-   .put(updateSpecificProductValidator, updateSpecificProduct)
+   .put(
+      uploadProductImages,
+      resizeProductImages,
+      updateSpecificProductValidator,
+      updateSpecificProduct
+   )
    .delete(deleteSpecificProductValidator, deleteSpecificProduct)
 
 

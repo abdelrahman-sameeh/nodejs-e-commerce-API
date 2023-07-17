@@ -3,11 +3,13 @@ const { createProduct, getListOfProducts, getSpecificProduct, deleteSpecificProd
 const { createProductValidator, updateSpecificProductValidator, getSpecificProductValidator, deleteSpecificProductValidator } = require('../utils/validator/product-validator');
 const router = express.Router();
 
-
+const authService = require('../services/auth-service')
 
 router.route('/')
    .get(getListOfProducts)
    .post(
+      authService.protect,
+      authService.allowedTo('admin', 'manager'),
       uploadProductImages,
       resizeProductImages,
       createProductValidator,
@@ -16,12 +18,19 @@ router.route('/')
 router.route('/:id')
    .get(getSpecificProductValidator, getSpecificProduct)
    .put(
+      authService.protect,
+      authService.allowedTo('admin', 'manager'),
       uploadProductImages,
       resizeProductImages,
       updateSpecificProductValidator,
       updateSpecificProduct
    )
-   .delete(deleteSpecificProductValidator, deleteSpecificProduct)
+   .delete(
+      authService.protect,
+      authService.allowedTo('admin'),
+      deleteSpecificProductValidator,
+      deleteSpecificProduct
+   )
 
 
 

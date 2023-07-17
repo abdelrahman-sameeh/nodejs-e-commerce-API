@@ -9,7 +9,8 @@ const categoryRoute = require('./routes/category-route')
 const subCategoryRoute = require('./routes/sub-category-route')
 const brandsRoute = require('./routes/brands-route')
 const productRoute = require('./routes/product-route')
-const authRoute = require('./routes/user-route')
+const userRoute = require('./routes/user-route')
+const authRoute = require('./routes/auth-route')
 
 const { dbConnection } = require('./config/database')
 const ApiError = require('./utils/ApiError')
@@ -42,7 +43,8 @@ app.use('/api/v1/categories', categoryRoute)
 app.use('/api/v1/subcategories', subCategoryRoute)
 app.use('/api/v1/brands', brandsRoute)
 app.use('/api/v1/products', productRoute)
-app.use('/api/v1/users', authRoute)
+app.use('/api/v1/users', userRoute)
+app.use('/api/v1/auth', authRoute)
 
 
 

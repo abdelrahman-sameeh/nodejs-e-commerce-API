@@ -13,11 +13,13 @@ const uploadCategoryImage = uploadSingleImage('image')
 const resizeCategoryImage = AsyncHandler(async (req, res, next) => {
    const filename = `category-${uuidv4()}-${Date.now()}.jpeg`;
 
-   await sharp(req.file.buffer)
-      .resize(600, 600)
-      .toFormat('jpeg')
-      .jpeg({ quality: 90 })
-      .toFile(`uploads/categories/${filename}`)
+   if (req.file) {
+      await sharp(req.file.buffer)
+         .resize(600, 600)
+         .toFormat('jpeg')
+         .jpeg({ quality: 90 })
+         .toFile(`uploads/categories/${filename}`)
+   }
 
    // save image in body
    req.body.image = filename

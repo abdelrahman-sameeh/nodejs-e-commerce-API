@@ -21,12 +21,19 @@ exports.createOne = (modelName, targetName) =>
       const data = {
          ...req.body,
       }
+      // for username
+      if (req.body.username) {
+         data.slug = slugify(req.body.username)
+      }
+      // for category and brands name
       if (req.body.name) {
          data.slug = slugify(req.body.name)
       }
+      // for product title
       if (req.body.title) {
          data.slug = slugify(req.body.title)
       }
+
       const response = await modelName.create(data)
       if (!response) {
          return next(new ApiError(`${targetName} not created`, 400));
@@ -82,7 +89,6 @@ exports.getOne = (modelName, targetName) =>
       res.status(200).json({
          data: response
       })
-
    })
 
 

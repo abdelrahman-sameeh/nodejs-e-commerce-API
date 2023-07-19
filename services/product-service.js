@@ -73,7 +73,7 @@ exports.getListOfProducts = getListOfDocuments(Product, 'product')
 // @desc    Get specific Product
 // @route   GET /api/v1/products/:id
 // @access  Public
-exports.getSpecificProduct = getOne(Product, 'product')
+exports.getSpecificProduct = getOne(Product, 'product', 'reviews')
 
 // @desc    Update specific Product
 // @route   PUT /api/v1/products/:id

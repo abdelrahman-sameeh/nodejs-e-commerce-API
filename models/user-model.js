@@ -34,6 +34,38 @@ const userSchema = mongoose.Schema({
       enum: ['admin', 'user', 'manager'],
       default: 'user'
    },
+   // child references
+   wishList: [
+      {
+         type: mongoose.Schema.ObjectId,
+         ref: 'Product',
+         unique: [true, "can't save same product in wishList"]
+      }
+   ],
+   addresses: [
+      {
+         alias: {
+            type: String,
+            trim: true
+         },
+         details: {
+            type: String,
+            trim: true
+         },
+         phone: {
+            type: String,
+            trim: true
+         },
+         city: {
+            type: String,
+            trim: true
+         },
+         postalCode: {
+            type: String,
+            trim: true
+         },
+      }
+   ]
 }, { timestamps: true })
 
 
@@ -42,6 +74,8 @@ userSchema.pre('save', async function (next) {
    this.password = await bcrypt.hash(this.password, 12)
    next()
 })
+
+
 
 
 const User = mongoose.model('User', userSchema)

@@ -11,7 +11,7 @@ router.route('/signup')
    .post(signupValidator, signup)
 
 router.route('/login')
-   .get(loginValidator, login)
+   .post(loginValidator, login)
 
 router.route('/forgetPassword')
    .post(forgetPasswordValidator, forgetPassword)

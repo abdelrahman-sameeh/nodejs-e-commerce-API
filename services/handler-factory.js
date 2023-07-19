@@ -4,7 +4,7 @@ const ApiError = require('../utils/ApiError')
 const ApiFeature = require('../utils/ApiFeature')
 const Product = require('../models/product-model')
 
-/// @params {String} modelName 
+/// @params {String} Model 
 // ==>the model name
 /// @params {String} targetName  
 // ==>the name of on document
@@ -13,9 +13,9 @@ const Product = require('../models/product-model')
 
 
 // @desc   Create a new document
-// @route  POST /api/v1/{modelName}
+// @route  POST /api/v1/{Model}
 // access  private
-exports.createOne = (modelName, targetName) =>
+exports.createOne = (Model, targetName) =>
    AsyncHandler(async (req, res, next) => {
 
       const data = {
@@ -34,7 +34,7 @@ exports.createOne = (modelName, targetName) =>
          data.slug = slugify(req.body.title)
       }
 
-      const response = await modelName.create(data)
+      const response = await Model.create(data)
       if (!response) {
          return next(new ApiError(`${targetName} not created`, 400));
       }
@@ -47,7 +47,7 @@ exports.createOne = (modelName, targetName) =>
 
 
 // @decs   Get list of documents
-// @route  GET /api/v1/{modelName}
+// @route  GET /api/v1/{Model}
 // @access public
 exports.getListOfDocuments = (Model, targetName = '') =>
    AsyncHandler(async (req, res) => {
@@ -77,12 +77,21 @@ exports.getListOfDocuments = (Model, targetName = '') =>
 
 
 // @decs   Get specific document
-// @route  GET /api/v1/{modelName}/:id
+// @route  GET /api/v1/{Model}/:id
 // @access public
-exports.getOne = (modelName, targetName) =>
+exports.getOne = (Model, targetName, populateOpt) =>
    exports.getSpecificSubCategories = AsyncHandler(async (req, res, next) => {
       const { id } = req.params;
-      const response = await modelName.findById(id)
+      // 1- build query
+      let query = Model.findById(id)
+
+      if (populateOpt) {
+         query = query.populate(populateOpt)
+      }
+
+      // 2- execute query 
+      const response = await query;
+
       if (!response) {
          return next(new ApiError(`no ${targetName} matches this id ${id}`, 404))
       }
@@ -98,7 +107,7 @@ exports.getOne = (modelName, targetName) =>
 // @desc    Update specific categories
 // @route   PUT  /api/v1/categories/:id
 // @access  Private
-exports.updateOne = (modelName, targetName) =>
+exports.updateOne = (Model, targetName) =>
    AsyncHandler(async (req, res, next) => {
       const id = req.params.id
 
@@ -114,10 +123,14 @@ exports.updateOne = (modelName, targetName) =>
       }
 
 
-      const response = await modelName.findByIdAndUpdate(id, data, { new: true })
+      const response = await Model.findByIdAndUpdate(id, data, { new: true })
       if (!response) {
          return next(new ApiError(`no ${targetName} matches this id ${id}`, 404))
       }
+
+      // trigger for 'save' event ===> to change qty value and avg value in db 
+      response.save()
+
       res.status(200).json({ data: response })
 
    })
@@ -126,13 +139,23 @@ exports.updateOne = (modelName, targetName) =>
 // @desc    Delete specific categories
 // @route   DELETE  /api/v1/{model}/:id
 // @access  Private
-exports.deleteOne = (modelName, targetName) =>
+exports.deleteOne = (Model, targetName) =>
    AsyncHandler(async (req, res, next) => {
       const { id } = req.params
-      const response = await modelName.findByIdAndDelete(id)
-
+      const response = await Model.findByIdAndDelete(id)
+      
+      // trigger for 'save' or 'remove' event ===> to change qty value and avg value in db 
+      // response.save() or 'remove()'
+      if(targetName === 'review'){
+         const test = await Model.findOneAndUpdate({}, {})
+         test.save()
+      }
+      
+      // handle error 
       if (!response) {
          return next(new ApiError(`no ${targetName} matches this id ${id}`, 404))
       }
+
+
       res.status(204).send()
    })

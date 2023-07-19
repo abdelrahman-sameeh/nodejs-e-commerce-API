@@ -11,6 +11,9 @@ const brandsRoute = require('./routes/brands-route')
 const productRoute = require('./routes/product-route')
 const userRoute = require('./routes/user-route')
 const authRoute = require('./routes/auth-route')
+const reviewRoute = require('./routes/review-route')
+const wishListRoute = require('./routes/wish-list-route')
+const addressRoute = require('./routes/address-route')
 
 const { dbConnection } = require('./config/database')
 const ApiError = require('./utils/ApiError')
@@ -45,6 +48,9 @@ app.use('/api/v1/brands', brandsRoute)
 app.use('/api/v1/products', productRoute)
 app.use('/api/v1/users', userRoute)
 app.use('/api/v1/auth', authRoute)
+app.use('/api/v1/review', reviewRoute)
+app.use('/api/v1/wishList', wishListRoute)
+app.use('/api/v1/addresses', addressRoute)
 
 
 

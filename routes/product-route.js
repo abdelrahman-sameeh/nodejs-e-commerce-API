@@ -4,6 +4,15 @@ const { createProductValidator, updateSpecificProductValidator, getSpecificProdu
 const router = express.Router();
 
 const authService = require('../services/auth-service')
+const reviewRoute = require('./review-route')
+
+
+// nested route with all reviews
+// POST     /products/::productId/reviews
+// GET      /products/::productId/reviews
+router.use('/:productId/reviews', reviewRoute)
+// GET      /products/::productId/reviews/::reviewId
+router.use('/:productId/reviews/:reviewId', reviewRoute)
 
 router.route('/')
    .get(getListOfProducts)

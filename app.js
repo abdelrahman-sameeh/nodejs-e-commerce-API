@@ -5,19 +5,11 @@ const app = express()
 const morgan = require('morgan')
 
 require('dotenv').config({ path: '.env' })
-const categoryRoute = require('./routes/category-route')
-const subCategoryRoute = require('./routes/sub-category-route')
-const brandsRoute = require('./routes/brands-route')
-const productRoute = require('./routes/product-route')
-const userRoute = require('./routes/user-route')
-const authRoute = require('./routes/auth-route')
-const reviewRoute = require('./routes/review-route')
-const wishListRoute = require('./routes/wish-list-route')
-const addressRoute = require('./routes/address-route')
 
 const { dbConnection } = require('./config/database')
 const ApiError = require('./utils/ApiError')
 const { globalError } = require('./middleware/error-middleware')
+const { mountRoutes } = require('./routes/index')
 
 
 // connect with database
@@ -25,10 +17,8 @@ dbConnection()
 
 
 // Middleware
-
 app.use(express.json())
 app.use(express.static(path.join(__dirname, 'uploads')))
-
 
 if (process.env.NODE_ENV === 'dev') {
    app.use(morgan('dev'))
@@ -39,20 +29,8 @@ if (process.env.NODE_ENV) {
 }
 
 
-
-
 // Mount Routes
-app.use('/api/v1/categories', categoryRoute)
-app.use('/api/v1/subcategories', subCategoryRoute)
-app.use('/api/v1/brands', brandsRoute)
-app.use('/api/v1/products', productRoute)
-app.use('/api/v1/users', userRoute)
-app.use('/api/v1/auth', authRoute)
-app.use('/api/v1/review', reviewRoute)
-app.use('/api/v1/wishList', wishListRoute)
-app.use('/api/v1/addresses', addressRoute)
-
-
+mountRoutes(app)
 
 
 // handle all route 
@@ -84,4 +62,6 @@ process.on('unhandledRejection', (err) => {
       // close app
       process.exit(1)
    })
-}) 
+})
+
+

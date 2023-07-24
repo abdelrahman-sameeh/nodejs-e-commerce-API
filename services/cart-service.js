@@ -37,6 +37,7 @@ exports.setProductInLoggedUserCart = asyncHandler(async (req, res, next) => {
 
    let cart = await Cart.findOne({ user: req.user._id })
 
+
    if (!cart) {
       // if have no cart
       // 1- create cart and set data on it
@@ -76,6 +77,9 @@ exports.setProductInLoggedUserCart = asyncHandler(async (req, res, next) => {
    // calculate total cart price
    const totalCartPrice = calcTotalCartPrice(cart)
    cart.totalCartPrice = totalCartPrice
+
+   // to reset discount after add new item to cart
+   cart.totalPriceAfterDiscount = undefined
 
 
    await cart.save()

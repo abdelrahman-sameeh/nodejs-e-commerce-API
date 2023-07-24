@@ -38,7 +38,7 @@ exports.login = asyncHandler(async (req, res, next) => {
    const user = await User.findOne({ email: req.body.email })
    // 3- generate token
    const token = generateToken(user._id)
-   
+
    // 4- send response
    req.user = user
 

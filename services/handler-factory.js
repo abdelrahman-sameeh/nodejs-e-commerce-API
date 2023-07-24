@@ -82,8 +82,17 @@ exports.getListOfDocuments = (Model, targetName = '') =>
 exports.getOne = (Model, targetName, populateOpt) =>
    exports.getSpecificSubCategories = AsyncHandler(async (req, res, next) => {
       const { id } = req.params;
+
+
       // 1- build query
       let query = Model.findById(id)
+
+
+      // use it to get specific order 
+      if (req.user.role === 'user' && targetName === 'order') {
+         query = Model.findOne({ user: req.user._id, _id: id })
+      }
+
 
       if (populateOpt) {
          query = query.populate(populateOpt)
@@ -143,14 +152,14 @@ exports.deleteOne = (Model, targetName) =>
    AsyncHandler(async (req, res, next) => {
       const { id } = req.params
       const response = await Model.findByIdAndDelete(id)
-      
+
       // trigger for 'save' or 'remove' event ===> to change qty value and avg value in db 
       // response.save() or 'remove()'
-      if(targetName === 'review'){
+      if (targetName === 'review') {
          const test = await Model.findOneAndUpdate({}, {})
          test.save()
       }
-      
+
       // handle error 
       if (!response) {
          return next(new ApiError(`no ${targetName} matches this id ${id}`, 404))

@@ -1,5 +1,3 @@
-const app = require("../app")
-
 const categoryRoute = require('./category-route')
 const subCategoryRoute = require('./sub-category-route')
 const brandsRoute = require('./brands-route')
@@ -11,6 +9,7 @@ const wishListRoute = require('./wish-list-route')
 const addressRoute = require('./address-route')
 const couponRoute = require('./coupon-route')
 const cartRoute = require('./cart-route')
+const orderRoute = require('./order-route')
 
 exports.mountRoutes = (app) => {
    app.use('/api/v1/categories', categoryRoute)
@@ -24,4 +23,5 @@ exports.mountRoutes = (app) => {
    app.use('/api/v1/addresses', addressRoute)
    app.use('/api/v1/coupons', couponRoute)
    app.use('/api/v1/cart', cartRoute)
+   app.use('/api/v1/orders', orderRoute)
 }

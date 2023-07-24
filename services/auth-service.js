@@ -12,6 +12,7 @@ const generateToken = require('../utils/generateToken')
 // @route   POST  /api/v1/auth/signup
 // @access  Public
 exports.signup = asyncHandler(async (req, res, next) => {
+   console.log(req.body);
    // 1) create user 
    const user = await User.create({
       username: req.body.username,

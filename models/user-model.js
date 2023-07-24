@@ -33,13 +33,12 @@ const userSchema = mongoose.Schema({
       type: String,
       enum: ['admin', 'user', 'manager'],
       default: 'user'
-   },
+   }, 
    // child references
    wishList: [
       {
          type: mongoose.Schema.ObjectId,
          ref: 'Product',
-         unique: [true, "can't save same product in wishList"]
       }
    ],
    addresses: [

@@ -4,6 +4,7 @@ const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const compression = require('compression')
+const bodyParser = require('body-parser')
 
 require('dotenv').config({ path: '.env' })
 
@@ -41,7 +42,7 @@ if (process.env.NODE_ENV) {
 
 
 
-app.post('/webhook-checkout', express.raw({ type: 'application/json' }), webhookCheckout)
+app.post('/webhook-checkout',  bodyParser.raw({type: 'application/json'}), webhookCheckout)
 
 
 // Mount Routes

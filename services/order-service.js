@@ -230,14 +230,27 @@ exports.webhookCheckout = asyncHandler((req, res) => {
       return;
    }
 
-   if (event.type === 'checkout.session.completed') {
-      createCardOrder(event.data.object)
-   }else{
-      createCardOrder(event.data.object)
-   }
 
-   res.status(200).json({
-      received: true
-   })
+   switch (event.type) {
+      case 'customer.subscription.created':
+         subscription = event.data.object;
+         let status = subscription.status;
+         console.log(`Subscription status is ${status}.`);
+
+         break;
+      default:
+         console.log(`Unhandled event type ${event.type}.`);
+   }
+   response.send();
+
+   // if (event.type === 'checkout.session.completed') {
+   //    createCardOrder(event.data.object)
+   // }else{
+   //    createCardOrder(event.data.object)
+   // }
+
+   // res.status(200).json({
+   //    received: true
+   // })
 
 })

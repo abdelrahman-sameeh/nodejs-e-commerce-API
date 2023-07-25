@@ -1,9 +1,9 @@
-const asyncHandler = require('express-async-handler');
 const stripe = require('stripe')(`${process.env.STRIPE_SECRET}`)
-
-const Order = require('../models/order-model');
+const asyncHandler = require('express-async-handler');
 const factory = require('./handler-factory');
 const ApiError = require('../utils/ApiError');
+
+const Order = require('../models/order-model');
 const Cart = require('../models/cart-model');
 const Product = require('../models/product-model');
 const User = require('../models/user-model');
@@ -218,7 +218,10 @@ const createCardOrder = async (session) => {
 }
 
 
-exports.webhookCheckout = asyncHandler((req, res) => {
+// @desc    This webhook will run when stripe payment success paid
+// @route   POST /webhook-checkout
+// @access  Protected/User
+exports.webhookCheckout = asyncHandler(async (req, res) => {
    const sig = req.headers['stripe-signature'];
 
    let event;
@@ -231,26 +234,14 @@ exports.webhookCheckout = asyncHandler((req, res) => {
    }
 
 
-   switch (event.type) {
-      case 'customer.subscription.created':
-         subscription = event.data.object;
-         let status = subscription.status;
-         console.log(`Subscription status is ${status}.`);
-
-         break;
-      default:
-         console.log(`Unhandled event type ${event.type}.`);
+   if (event.type === 'checkout.session.completed') {
+      createCardOrder(event.data.object)
+   } else {
+      createCardOrder(event.data.object)
    }
-   response.send();
 
-   // if (event.type === 'checkout.session.completed') {
-   //    createCardOrder(event.data.object)
-   // }else{
-   //    createCardOrder(event.data.object)
-   // }
-
-   // res.status(200).json({
-   //    received: true
-   // })
+   res.status(200).json({
+      received: true
+   })
 
 })

@@ -6,6 +6,7 @@ const factory = require('./handler-factory');
 const ApiError = require('../utils/ApiError');
 const Cart = require('../models/cart-model');
 const Product = require('../models/product-model');
+const User = require('../models/user-model');
 
 
 
@@ -176,6 +177,47 @@ exports.createStripeSession = asyncHandler(async (req, res, next) => {
 
 
 
+const createCardOrder = async (session) => {
+   const cartId = session.client_reference_id
+   const amount = session.amount_total
+   const address = session.metadata
+   const userEmail = session.email
+
+   // 1- get user cart depend on cartId
+   const cart = await Cart.findById(cartId)
+   const user = await User.findOne({ email: userEmail })
+
+
+   // 2- create order
+   const data = {
+      user: user._id,
+      cartItems: cart.cartItems,
+      totalOrderPrice: amount,
+      shippingAddress: address,
+      isPaid: true,
+      paidAt: Date.now(),
+      paymentMethod: 'card'
+   }
+
+   const order = await Order.create(data)
+
+   // 3- update product qty and sold
+   if (order) {
+      const bulkOption = cart.cartItems.map((item) => ({
+         updateOne: {
+            filter: { _id: item.product },
+            update: { $inc: { quantity: -item.quantity, sold: +item.quantity } }
+         }
+      }))
+      await Product.bulkWrite(bulkOption)
+   }
+
+   // 4- delete cart 
+   await Cart.findByIdAndDelete(cartId)
+
+}
+
+
 exports.webhookCheckout = asyncHandler((req, res) => {
    const sig = req.headers['stripe-signature'];
 
@@ -188,10 +230,12 @@ exports.webhookCheckout = asyncHandler((req, res) => {
       return;
    }
 
-   if(event.type === 'checkout.session.completed'){
-      console.log('create order here')
-   }else{
-      console.log('error')
+   if (event.type === 'checkout.session.completed') {
+      createCardOrder(event.data.object)
    }
+
+   res.status(200).json({
+      received: true
+   })
 
 })

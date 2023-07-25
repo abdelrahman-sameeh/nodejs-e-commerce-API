@@ -226,7 +226,6 @@ exports.webhookCheckout = asyncHandler(async (req, res) => {
 
    let event;
 
-   console.log(req.body);
 
    try {
       event = stripe.webhooks.constructEvent(
@@ -241,11 +240,11 @@ exports.webhookCheckout = asyncHandler(async (req, res) => {
 
    console.log(event.type);
 
-   if (event.type === 'checkout.session.completed') {
-      createCardOrder(event.data.object)
-   } else {
-      createCardOrder(event.data.object)
-   }
+   // if (event.type == 'checkout.session.completed') {
+   //    createCardOrder(event.data.object)
+   // } else {
+   //    createCardOrder(event.data.object)
+   // }
 
    res.status(200).json({
       received: true

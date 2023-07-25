@@ -190,6 +190,8 @@ exports.webhookCheckout = asyncHandler((req, res) => {
 
    if(event.type === 'checkout.session.completed'){
       console.log('create order here')
+   }else{
+      console.log('error')
    }
 
 })

@@ -226,19 +226,25 @@ exports.webhookCheckout = asyncHandler(async (req, res) => {
 
    let event;
 
-
    try {
-      event = stripe.webhooks.constructEvent(
-         req.body,
-         sig,
-         'whsec_vO7HpObmuxAC5UA3WCJTucDuIvQQL783'
-      );
+      event = JSON.parse(req.body);
    } catch (err) {
-      console.log(err);
-      return res.status(400).json({
-         error: err.message
-      });
+      response.status(400).send(`Webhook Error: ${err.message}`);
    }
+
+
+   // try {
+   //    event = stripe.webhooks.constructEvent(
+   //       req.body,
+   //       sig,
+   //       'whsec_vO7HpObmuxAC5UA3WCJTucDuIvQQL783'
+   //    );
+   // } catch (err) {
+   //    console.log(err);
+   //    return res.status(400).json({
+   //       error: err.message
+   //    });
+   // }
 
    console.log(event.type);
 

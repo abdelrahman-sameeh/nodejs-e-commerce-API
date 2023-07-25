@@ -179,8 +179,8 @@ exports.createStripeSession = asyncHandler(async (req, res, next) => {
 
 const createCardOrder = async (session) => {
    const cartId = session.client_reference_id
-   const amount = session.amount_total
-   const address = session.metadata
+   const totalOrderPrice = session.amount_total / 100
+   const shippingAddress = session.metadata
    const userEmail = session.email
 
    // 1- get user cart depend on cartId
@@ -192,8 +192,8 @@ const createCardOrder = async (session) => {
    const data = {
       user: user._id,
       cartItems: cart.cartItems,
-      totalOrderPrice: amount,
-      shippingAddress: address,
+      totalOrderPrice,
+      shippingAddress,
       isPaid: true,
       paidAt: Date.now(),
       paymentMethod: 'card'
@@ -226,15 +226,21 @@ exports.webhookCheckout = asyncHandler(async (req, res) => {
 
    let event;
 
+   console.log(req.body);
+
    try {
-      event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+      event = stripe.webhooks.constructEvent(
+         req.body,
+         sig,
+         process.env.STRIPE_WEBHOOK_SECRET
+      );
    } catch (err) {
       res.status(400).send(`Webhook Error: ${err.message}`);
       return;
    }
 
    console.log(event.type);
-   
+
    if (event.type === 'checkout.session.completed') {
       createCardOrder(event.data.object)
    } else {

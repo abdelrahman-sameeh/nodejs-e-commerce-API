@@ -145,7 +145,7 @@ exports.createStripeSession = asyncHandler(async (req, res, next) => {
    let totalOrderPrice = cart.totalCartPrice + taxPrice + shippingPrice;
    if (cart.totalPriceAfterDiscount) {
       totalOrderPrice = cart.totalPriceAfterDiscount + taxPrice + shippingPrice
-   }  
+   }
 
 
 
@@ -164,12 +164,32 @@ exports.createStripeSession = asyncHandler(async (req, res, next) => {
       mode: 'payment',
       success_url: `${req.protocol}://${req.get('host')}/orders`,
       cancel_url: `${req.protocol}://${req.get('host')}/cart`,
-      client_reference_id: req.params.id,  
+      client_reference_id: req.params.id,
       customer_email: req.user.email,
       metadata: req.body.shippingAddress,
    });
 
    // 4) send session to response
    res.status(200).json({ status: 'success', session });
+
+})
+
+
+
+exports.webhookCheckout = asyncHandler((req, res) => {
+   const sig = req.headers['stripe-signature'];
+
+   let event;
+
+   try {
+      event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+   } catch (err) {
+      res.status(400).send(`Webhook Error: ${err.message}`);
+      return;
+   }
+
+   if(event.type === 'checkout.session.completed'){
+      console.log('create order here')
+   }
 
 })

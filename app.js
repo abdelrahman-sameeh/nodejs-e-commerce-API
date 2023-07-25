@@ -1,8 +1,9 @@
 const path = require('path')
 
 const express = require('express')
-const app = express()
 const morgan = require('morgan')
+const cors = require('cors')
+const compression = require('compression')
 
 require('dotenv').config({ path: '.env' })
 
@@ -10,7 +11,17 @@ const { dbConnection } = require('./config/database')
 const ApiError = require('./utils/ApiError')
 const { globalError } = require('./middleware/error-middleware')
 const { mountRoutes } = require('./routes/index')
+const { webhookCheckout } = require('./services/order-service')
 
+
+
+const app = express()
+// allow any client access end points
+app.use(cors())
+app.options('*', cors())
+
+// use it to compressed the response
+app.use(compression())
 
 // connect with database
 dbConnection()
@@ -29,8 +40,14 @@ if (process.env.NODE_ENV) {
 }
 
 
+
+app.post('/webhook-checkout', express.raw({ type: 'application/json' }), webhookCheckout)
+
+
 // Mount Routes
 mountRoutes(app)
+
+
 
 
 // handle all route 

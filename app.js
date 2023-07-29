@@ -4,6 +4,9 @@ const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const compression = require('compression')
+const hpp = require('hpp')
+const limiter = require('express-rate-limit')
+const mongoSanitize= require('express-mongo-sanitize')
 
 require('dotenv').config({ path: '.env' })
 
@@ -28,17 +31,22 @@ dbConnection()
 
 
 // Middleware
-app.use(express.json())
+app.use(express.json({ limit: '10kb' }))
 app.use(express.static(path.join(__dirname, 'uploads')))
 
 if (process.env.NODE_ENV === 'dev') {
    app.use(morgan('dev'))
 }
 
-if (process.env.NODE_ENV) {
-   console.log(`node ${process.env.NODE_ENV}`);
-}
+app.use(mongoSanitize())
 
+app.use(hpp({ whitelist: ['price', 'sold', 'quantity', 'ratingQuantity'] }))
+
+// Limit each IP to 5 requests per `window` (here, per 15 minutes)
+app.use('/api/v1/auth/forgetPassword', limiter({
+   windowMs: 15 * 60 * 1000, // 15 minutes
+   max: 3,
+}))
 
 // Checkout webhook
 app.post(

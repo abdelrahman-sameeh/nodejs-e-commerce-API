@@ -49,7 +49,7 @@ exports.loginValidator = [
          return true
       }),
    check('password')
-      .isLength({ min: 2 }).withMessage('username must be 2 character or more')
+      .isLength({ min: 6 }).withMessage('password must be 6 character or more')
       .notEmpty().withMessage('enter your password')
       .custom(async (value, { req }) => {
          const user = req.user

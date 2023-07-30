@@ -224,27 +224,26 @@ const createCardOrder = async (session) => {
 exports.webhookCheckout = asyncHandler(async (req, res, next) => {
    const sig = req.headers['stripe-signature'];
 
-   let event;
+   let event = 'test';
 
-   console.log(req.body);
 
-   // try {
-   //    event = stripe.webhooks.constructEvent(
-   //       req.body,
-   //       sig,
-   //       process.env.STRIPE_WEBHOOK_SECRET
-   //    );
-   // } catch (err) {
-   //    return res.status(400).send(`Webhook Error: ${err.message}`);
-   // }
-   if (event.type === 'checkout.session.completed') {
-      console.log('create cash order')
-      //  Create order
-      // createCardOrder(event.data.object);
-   }else{
-      console.log('nooooooooooooooo')
-      
+   try {
+      event = stripe.webhooks.constructEvent(
+         req.body,
+         sig,
+         process.env.STRIPE_WEBHOOK_SECRET
+      );
+   } catch (err) {
+      return res.status(400).send(`Webhook Error: ${err.message}`);
    }
+
+   console.log(event)
+
+   // if (event.type === 'checkout.session.completed') {
+   //    console.log('create cash order')
+   //    //  Create order
+   //    // createCardOrder(event.data.object);
+   // }
 
    res.status(200).json({ received: true });
 });

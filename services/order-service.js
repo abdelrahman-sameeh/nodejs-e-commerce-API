@@ -177,7 +177,7 @@ exports.createStripeSession = asyncHandler(async (req, res, next) => {
 
 
 
-const createCardOrder = async (session) => {
+const createCardOrder = async (session, res) => {
 
 
 
@@ -192,9 +192,7 @@ const createCardOrder = async (session) => {
       return next(new ApiError(`no cart match this id ${cartId}`, 404))
    }
 
-   console.log(userEmail);
    const user = await User.findOne({ email: userEmail })
-   console.log(user);
 
 
    // 2- create order
@@ -255,7 +253,7 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
 
    if (event.type === 'checkout.session.completed') {
       //  Create order
-      createCardOrder(event.data.object);
+      createCardOrder(event.data.object, res);
    }
 
    res.status(200).json({ received: true });

@@ -30,6 +30,14 @@ app.use(compression())
 dbConnection()
 
 
+
+// Checkout webhook
+app.post(
+   '/webhook-checkout',
+   express.raw({ type: 'application/json' }),
+   webhookCheckout
+)
+
 // Middleware
 app.use(express.json({ limit: '10kb' }))
 app.use(express.static(path.join(__dirname, 'uploads')))
@@ -48,12 +56,7 @@ app.use('/api/v1/auth/forgetPassword', limiter({
    max: 3,
 }))
 
-// Checkout webhook
-app.post(
-   '/webhook-checkout',
-   express.raw({ type: 'application/json' }),
-   webhookCheckout
-)
+
 
 
 // Mount Routes

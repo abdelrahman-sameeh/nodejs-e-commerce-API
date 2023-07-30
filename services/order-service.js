@@ -185,6 +185,10 @@ const createCardOrder = async (session) => {
 
    // 1- get user cart depend on cartId
    const cart = await Cart.findById(cartId)
+   if (!cart) {
+      return next(new ApiError('no cart match this id', 404))
+   }
+
    const user = await User.findOne({ email: userEmail })
 
 
@@ -199,6 +203,8 @@ const createCardOrder = async (session) => {
       paymentMethod: 'card'
    }
 
+   console.log(data);
+
    const order = await Order.create(data)
 
    // 3- update product qty and sold
@@ -210,10 +216,14 @@ const createCardOrder = async (session) => {
          }
       }))
       await Product.bulkWrite(bulkOption)
+
+      // 4- delete cart 
+      await Cart.findByIdAndDelete(cartId)
    }
 
-   // 4- delete cart 
-   await Cart.findByIdAndDelete(cartId)
+   res.status(201).json({
+      data: order
+   })
 
 }
 
@@ -238,11 +248,13 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
       return res.status(400).send(`Webhook Error: ${err.message}`);
    }
 
-   console.log('done');
-   
+
    if (event.type === 'checkout.session.completed') {
+      console.log('okkk');
       //  Create order
       createCardOrder(event.data.object);
+   }else{
+      console.log('nooooooo');
    }
 
    res.status(200).json({ received: true });

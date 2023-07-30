@@ -177,7 +177,7 @@ exports.createStripeSession = asyncHandler(async (req, res, next) => {
 
 
 
-const createCardOrder = async (session, res) => {
+const createCardOrder = async (session) => {
 
 
 
@@ -223,9 +223,6 @@ const createCardOrder = async (session, res) => {
       await Cart.findByIdAndDelete(cartId)
    }
 
-   res.status(201).json({
-      data: order
-   })
 
 }
 
@@ -253,7 +250,7 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
 
    if (event.type === 'checkout.session.completed') {
       //  Create order
-      createCardOrder(event.data.object, res);
+      createCardOrder(event.data.object);
    }
 
    res.status(200).json({ received: true });

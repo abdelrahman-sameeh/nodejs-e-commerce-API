@@ -178,6 +178,7 @@ exports.createStripeSession = asyncHandler(async (req, res, next) => {
 
 
 const createCardOrder = async (session) => {
+
    const cartId = session.client_reference_id
    const totalOrderPrice = session.amount_total / 100
    const shippingAddress = session.metadata
@@ -189,41 +190,43 @@ const createCardOrder = async (session) => {
       return next(new ApiError('no cart match this id', 404))
    }
 
+   console.log(userEmail);
    const user = await User.findOne({ email: userEmail })
+   console.log(user);
+   
 
+   // // 2- create order
+   // const data = {
+   //    user: user._id,
+   //    cartItems: cart.cartItems,
+   //    totalOrderPrice,
+   //    shippingAddress,
+   //    isPaid: true,
+   //    paidAt: Date.now(),
+   //    paymentMethod: 'card'
+   // }
 
-   // 2- create order
-   const data = {
-      user: user._id,
-      cartItems: cart.cartItems,
-      totalOrderPrice,
-      shippingAddress,
-      isPaid: true,
-      paidAt: Date.now(),
-      paymentMethod: 'card'
-   }
+   // console.log(data);
 
-   console.log(data);
+   // const order = await Order.create(data)
 
-   const order = await Order.create(data)
+   // // 3- update product qty and sold
+   // if (order) {
+   //    const bulkOption = cart.cartItems.map((item) => ({
+   //       updateOne: {
+   //          filter: { _id: item.product },
+   //          update: { $inc: { quantity: -item.quantity, sold: +item.quantity } }
+   //       }
+   //    }))
+   //    await Product.bulkWrite(bulkOption)
 
-   // 3- update product qty and sold
-   if (order) {
-      const bulkOption = cart.cartItems.map((item) => ({
-         updateOne: {
-            filter: { _id: item.product },
-            update: { $inc: { quantity: -item.quantity, sold: +item.quantity } }
-         }
-      }))
-      await Product.bulkWrite(bulkOption)
+   //    // 4- delete cart 
+   //    await Cart.findByIdAndDelete(cartId)
+   // }
 
-      // 4- delete cart 
-      await Cart.findByIdAndDelete(cartId)
-   }
-
-   res.status(201).json({
-      data: order
-   })
+   // res.status(201).json({
+   //    data: order
+   // })
 
 }
 
@@ -250,11 +253,8 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
 
 
    if (event.type === 'checkout.session.completed') {
-      console.log('okkk');
       //  Create order
       createCardOrder(event.data.object);
-   }else{
-      console.log('nooooooo');
    }
 
    res.status(200).json({ received: true });

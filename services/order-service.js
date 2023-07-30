@@ -179,54 +179,55 @@ exports.createStripeSession = asyncHandler(async (req, res, next) => {
 
 const createCardOrder = async (session) => {
 
+
+
    const cartId = session.client_reference_id
    const totalOrderPrice = session.amount_total / 100
    const shippingAddress = session.metadata
-   const userEmail = session.email
+   const userEmail = session.customer_email
 
    // 1- get user cart depend on cartId
    const cart = await Cart.findById(cartId)
    if (!cart) {
-      return next(new ApiError('no cart match this id', 404))
+      return next(new ApiError(`no cart match this id ${cartId}`, 404))
    }
 
    console.log(userEmail);
    const user = await User.findOne({ email: userEmail })
    console.log(user);
-   
 
-   // // 2- create order
-   // const data = {
-   //    user: user._id,
-   //    cartItems: cart.cartItems,
-   //    totalOrderPrice,
-   //    shippingAddress,
-   //    isPaid: true,
-   //    paidAt: Date.now(),
-   //    paymentMethod: 'card'
-   // }
 
-   // console.log(data);
+   // 2- create order
+   const data = {
+      user: user._id,
+      cartItems: cart.cartItems,
+      totalOrderPrice,
+      shippingAddress,
+      isPaid: true,
+      paidAt: Date.now(),
+      paymentMethod: 'card'
+   }
 
-   // const order = await Order.create(data)
 
-   // // 3- update product qty and sold
-   // if (order) {
-   //    const bulkOption = cart.cartItems.map((item) => ({
-   //       updateOne: {
-   //          filter: { _id: item.product },
-   //          update: { $inc: { quantity: -item.quantity, sold: +item.quantity } }
-   //       }
-   //    }))
-   //    await Product.bulkWrite(bulkOption)
+   const order = await Order.create(data)
 
-   //    // 4- delete cart 
-   //    await Cart.findByIdAndDelete(cartId)
-   // }
+   // 3- update product qty and sold
+   if (order) {
+      const bulkOption = cart.cartItems.map((item) => ({
+         updateOne: {
+            filter: { _id: item.product },
+            update: { $inc: { quantity: -item.quantity, sold: +item.quantity } }
+         }
+      }))
+      await Product.bulkWrite(bulkOption)
 
-   // res.status(201).json({
-   //    data: order
-   // })
+      // 4- delete cart 
+      await Cart.findByIdAndDelete(cartId)
+   }
+
+   res.status(201).json({
+      data: order
+   })
 
 }
 
